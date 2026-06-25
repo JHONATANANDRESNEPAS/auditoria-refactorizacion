@@ -4,7 +4,7 @@ import java.sql.*;
 
 public class GestorPedidos {
 
-    // Método reutilizable: eliminamos validaciones repetidas
+    // Método reutilizable para validar cliente
     private boolean esClienteValido(String nombre, String email) {
         if (nombre == null || nombre.trim().isEmpty()) {
             System.out.println("Error: nombre de cliente inválido");
@@ -15,6 +15,17 @@ public class GestorPedidos {
             return false;
         }
         return true;
+    }
+
+    // Método para obtener la estrategia de descuento según el tipo de cliente
+    private EstrategiaDescuento obtenerEstrategia(String tipoCliente) {
+        return switch (tipoCliente.toUpperCase()) {
+            case "VIP" -> new DescuentoVIP();
+            case "FRECUENTE" -> new DescuentoFrecuente();
+            case "REGULAR" -> new DescuentoRegular();
+            case "NUEVO" -> new DescuentoNuevo();
+            default -> new DescuentoNuevo();
+        };
     }
 
     public void procesarPedido(String nombreCliente, String emailCliente,
@@ -30,16 +41,9 @@ public class GestorPedidos {
             subtotal += preciosProductos.get(i) * cantidades.get(i);
         }
 
-        double descuento = 0;
-        if (tipoCliente.equals("VIP")) {
-            descuento = subtotal * 0.20;
-        } else if (tipoCliente.equals("FRECUENTE")) {
-            descuento = subtotal * 0.10;
-        } else if (tipoCliente.equals("REGULAR")) {
-            descuento = subtotal * 0.05;
-        } else if (tipoCliente.equals("NUEVO")) {
-            descuento = 0;
-        }
+        // Usamos la estrategia en lugar de múltiples if-else
+        EstrategiaDescuento estrategia = obtenerEstrategia(tipoCliente);
+        double descuento = estrategia.calcular(subtotal);
 
         double impuesto = (subtotal - descuento) * 0.12;
         double total = subtotal - descuento + impuesto;
