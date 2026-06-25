@@ -4,16 +4,24 @@ import java.sql.*;
 
 public class GestorPedidos {
 
+    // Método reutilizable: eliminamos validaciones repetidas
+    private boolean esClienteValido(String nombre, String email) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            System.out.println("Error: nombre de cliente inválido");
+            return false;
+        }
+        if (email == null || !email.contains("@")) {
+            System.out.println("Error: email inválido");
+            return false;
+        }
+        return true;
+    }
+
     public void procesarPedido(String nombreCliente, String emailCliente,
             List<String> nombresProductos, List<Double> preciosProductos,
             List<Integer> cantidades, String tipoCliente) {
 
-        if (nombreCliente == null || nombreCliente.trim().isEmpty()) {
-            System.out.println("Error: nombre de cliente inválido");
-            return;
-        }
-        if (emailCliente == null || !emailCliente.contains("@")) {
-            System.out.println("Error: email inválido");
+        if (!esClienteValido(nombreCliente, emailCliente)) {
             return;
         }
 
@@ -72,12 +80,7 @@ public class GestorPedidos {
     }
 
     public void cancelarPedido(String nombreCliente, String emailCliente, int idPedido) {
-        if (nombreCliente == null || nombreCliente.trim().isEmpty()) {
-            System.out.println("Error: nombre de cliente inválido");
-            return;
-        }
-        if (emailCliente == null || !emailCliente.contains("@")) {
-            System.out.println("Error: email inválido");
+        if (!esClienteValido(nombreCliente, emailCliente)) {
             return;
         }
 
